@@ -8,9 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
 	const originalUrlElement = document.getElementById("original-url")
 	const pageTitleElement = document.getElementById("page-title")
 
+	let currentBaseUrl = "" // Store the base URL for relative links
+
 	urlForm.addEventListener("submit", async (e) => {
 		e.preventDefault()
-		await fetchAndReplace(urlInput.value.trim())
+		currentBaseUrl = urlInput.value.trim() // Store the initial URL
+		await fetchAndReplace(currentBaseUrl)
 	})
 
 	async function fetchAndReplace(url) {
@@ -21,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		// Show loading indicator
 		loadingElement.classList.remove("hidden")
-		resultContainer.classList.add("hidden")
 		errorMessage.classList.add("hidden")
 
 		try {
@@ -39,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				throw new Error(data.error || "Failed to fetch content")
 			}
 
-			// Update the info bar
+			// Update the info bar with the current page URL
 			originalUrlElement.textContent = url
 			originalUrlElement.href = url
 			pageTitleElement.textContent = data.title || "No title"
@@ -68,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 						e.preventDefault()
 						const href = link.getAttribute("href")
 						if (href) {
-							// Handle relative URLs
+							// Handle relative URLs using the current page URL as base
 							const absoluteUrl = new URL(href, url).href
 							fetchAndReplace(absoluteUrl)
 						}
